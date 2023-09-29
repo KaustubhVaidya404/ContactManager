@@ -7,7 +7,7 @@ const getContact = asyncHandler(async (req,res) => {
 const createContact = asyncHandler(async (req,res)=>{
     console.log("Request body is",req.body);
     const {name, email, phone} =  req.body;
-    if(!name, !email, !phone){
+    if(!name || !email || !phone){
         res.status(400);
         throw new Error("All feilds are mandatory");
     }
