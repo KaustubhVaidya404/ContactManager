@@ -1,7 +1,10 @@
 const asyncHandler = require("express-async-handler");
+const Contact = require("../models/contactModel");
+const { param } = require("../routes/contactRoutes");
 
 const getContact = asyncHandler(async (req,res) => {
-    res.status(200).json({message:"Get all contacts"});
+    const contacts = await Contact.find(); 
+    res.status(200).json(contacts);
 });
 
 const createContact = asyncHandler(async (req,res)=>{
@@ -10,20 +13,52 @@ const createContact = asyncHandler(async (req,res)=>{
     if(!name || !email || !phone){
         res.status(400);
         throw new Error("All feilds are mandatory");
-    }
-    res.status(201).json({message:"Create contact"});
+    };
+
+    const contact = Contact.create({
+        name,
+        email,
+        phone,
+    });
+
+    res.status(201).json(contact);
 });
 
 const getSpecific = asyncHandler(async (req,res)=>{
-    res.status(200).json({message:`Get specific contact ${req.params.id}`});
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact not found");
+    }
+    res.status(200).json(contact);
 });
 
 const updateContact = asyncHandler(async (req,res)=>{
-    res.status(200).json({message:`Update contact for ${req.params.id}`});
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact not found");
+    }
+
+    const updateContact = await Contact.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {new: true}
+    );
+
+    res.status(200).json(updateContact);
 });
 
 const deleteContact = asyncHandler(async (req,res)=>{
-    res.status(200).json({message:`Delete contact for ${req.params.id}`});
+    const contact = await Contact.findById(req.params.id);
+    if(!contact){
+        res.status(404);
+        throw new Error("Contact not found");
+    };
+
+    await Contact.remove();
+
+    res.status(200).json(contact);
 });
 
 module.exports = {getContact, createContact, getSpecific, updateContact, deleteContact}
