@@ -41,22 +41,23 @@ const loginUser = asyncHandler(async (req,res)=>{
     }
     const user = await User.findOne({email});
     if(user && (await cryptjs.compare(password, user.password))){
-        const accessToken = jwt.sign({
-            user: {
+        const accessToken = jwt.sign(
+            {
+              user: {
                 username: user.username,
                 email: user.email,
-                id: user.id, 
+                id: user.id,
+              },
             },
-        }, 
-        process.env.ACCESSTOKEN,
-        {expiresIn: "1m"}
-    );
-        res.status(200).json({accessToken});
-    }else{
-        res.status(401);
-        throw new Error("email or password not valid")
-    }
-});
+            process.env.ACCESSTOKEN,
+            { expiresIn: "1ms" }
+          );
+          res.status(200).json({ accessToken });
+        } else {
+          res.status(401);
+          throw new Error("email or password is not valid");
+        }
+      });
 
 const currentUser = asyncHandler(async (req,res)=>{
     res.json({message:"Current user informantion"});
